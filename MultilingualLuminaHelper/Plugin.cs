@@ -1,7 +1,10 @@
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+using Lumina.Excel.GeneratedSheets;
 using MultilingualLuminaHelper.Windows;
+using System;
+using System.IO;
 
 namespace MultilingualLuminaHelper
 {
@@ -11,7 +14,7 @@ namespace MultilingualLuminaHelper
         private const string CommandName = "/mlh";
         public static Plugin Instance = null!;
 
-        private DalamudPluginInterface PluginInterface { get; init; }
+        internal DalamudPluginInterface PluginInterface { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("MultilingualLuminaHelper");
         private Main Main { get; init; }
@@ -31,6 +34,8 @@ namespace MultilingualLuminaHelper
                 HelpMessage = "Open the main window."
             });
 
+            GetLuminaDLL();
+
             PluginInterface.UiBuilder.Draw += DrawUI;
             PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
@@ -45,6 +50,32 @@ namespace MultilingualLuminaHelper
             Main.Dispose();
 
             Service.CommandManager.RemoveHandler(CommandName);
+        }
+
+        private void GetLuminaDLL()
+        {
+            var sourceDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "XIVLauncher", "addon", "Hooks", "dev");
+            var sourceFilePath = Path.Combine(sourceDirectory, "Lumina.Excel.dll");
+            var targetDirectory = PluginInterface.ConfigDirectory.FullName;
+
+            Directory.CreateDirectory(targetDirectory);
+
+            var targetFilePath = Path.Combine(targetDirectory, Path.GetFileName(sourceFilePath));
+
+            if (File.Exists(targetFilePath))
+            {
+                var sourceLastModified = File.GetLastWriteTime(sourceFilePath);
+                var targetLastModified = File.GetLastWriteTime(targetFilePath);
+
+                if (sourceLastModified > targetLastModified)
+                {
+                    File.Copy(sourceFilePath, targetFilePath, true);
+                }
+            }
+            else
+            {
+                File.Copy(sourceFilePath, targetFilePath);
+            }
         }
 
         private void OnCommand(string command, string args)
