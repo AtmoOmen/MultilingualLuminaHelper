@@ -1,0 +1,13 @@
+{
+    "Author": "AtmoOmen",
+    "Name": "Multilingual Lumina Helper",
+    "Punchline": "Access in-game Excel Sheets' Data in different languages.",
+    "Description": "In case of you suddenly having to refer to multilingual data but not have saved a bunch of .csv files.",
+    "InternalName": "MultilingualLuminaHelper",
+    "ApplicableVersion": "any",
+    "Tags": [
+        "Lumina",
+        "Excel",
+        "Multilingual"
+    ]
+}
